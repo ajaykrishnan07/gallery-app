@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Firestore } from "../firebase_setup/FireBase";
 
-export const ImageSearch = ({ searchText }) => {
+export const ImageSearch = ({ onSearch }) => {
   const [text, setText] = useState("");
   //const ref = Firestore.firestore().collection("text");
   //console.log(ref);
@@ -9,7 +8,7 @@ export const ImageSearch = ({ searchText }) => {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    searchText(text);
+    onSearch(text);
   };
   return (
     <div className="max-w-sm rounded overflow-hidden my-10 mx-auto">

@@ -1,15 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import "./App.css";
 import { ImageCard } from "./components/ImageCard";
 import { ImageSearch } from "./components/ImageSearch";
-import { Firestore } from "./firebase_setup/FireBase";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 function App() {
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [term, setTerm] = useState("");
 
-  useEffect(() => {
+  useEffect(()=>{
+    fetch(
+      `https://pixabay.com/api/?key=${
+        import.meta.env.VITE_APP_PIXABAY_API_KEY
+      }&q=&image_type=photo&pretty=true`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setImages(data.hits);
+        setIsLoading(false);
+      })
+      .catch((err) => console.log(err));
+  },[])
+
+
+  const onSearchHandler = (term) => {
+    const firestore = getFirestore()
+    const dataCollection = collection(firestore,"term")
+
+    addDoc(dataCollection, {
+      term
+    })
     fetch(
       `https://pixabay.com/api/?key=${
         import.meta.env.VITE_APP_PIXABAY_API_KEY
@@ -21,11 +41,11 @@ function App() {
         setIsLoading(false);
       })
       .catch((err) => console.log(err));
-  }, [term]);
+  }
 
   return (
     <div className="container mx-auto">
-      <ImageSearch searchText={(text) => setTerm(text)} />
+      <ImageSearch onSearch={onSearchHandler} />
 
       {!isLoading && images.length === 0 && (
         <h1 className="text-6xl text-center mx-auto mt-32">
